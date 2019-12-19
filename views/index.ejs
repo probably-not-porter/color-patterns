@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            #scroll-container{
+                overflow: scroll;
+                width: 620px;
+                height: 620px;
+                display: inline-block;
+            }
+            #pattern-container{
+                width: 600px;
+                height: 600px;
+                background: gray;
+                display: grid;
+                grid-template-columns: auto auto auto;
+            }
+            #type-container{
+                display: inline-block;
+                width: 200px;
+                height: 600px;
+                position: absolute;
+                right:0;
+                background-color: #ccc;
+            }
+            .box{
+                background-color: #444;
+                color: #fff;
+                width: 100%;
+                height: 100%;
+                box-sizing: border-box;
+                -moz-box-sizing: border-box;
+                -webkit-box-sizing: border-box;
+                border: 1px solid black;
+            }
+            .box:hover{
+                border: 1px solid white;
+            }
+            .type{
+                background-color: #bbb;
+                width: 90%;
+                margin-left: 5%;
+                margin-right: 5%;
+                height: 50px;
+                margin-bottom: 5px;
+                margin-top: 5px;
+                text-align: center;
+            }
+            .type-s{
+                box-sizing: border-box;
+                -moz-box-sizing: border-box;
+                -webkit-box-sizing: border-box;
+                border: 1px solid black;
+            }
+        </style>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    </head>
+    <body>
+        <div id='scroll-container'>
+            <div id='pattern-container'>
+            </div>
+        </div>
+        <div id='type-container'>
+            <button onclick='addcolor()'>+</button>
+            <div onclick='selectcolor(this)' class='type type-s'>
+                Yarn 1
+                <input class="type-0" type="color" name="favcolor" value="#ff0000" onchange="changecolor(this.value,this.classList.value)">
+                <button onclick='removecolor()'>X</button>
+            </div>
+        </div>
+        <div class="slider-width-height">
+            <input type="range" min="1" max="100" value="25" class="slider" onchange="adapt(this.value)">
+        </div>
+        <div class="slider-zoom">
+            <input type="range" min="1" max="5" value="1" class="slider" onchange="zoom(this.value)">
+        </div>
+        <script>
+            // VARS
+            var wh = 0;
+            var z = 1;
+            var color_arr = ["#ff0000"];
+            var select = 0;
+
+            function addcolor(){
+                color_arr.push("#ff0000");
+                var container = document.getElementById("type-container");
+                var yarn = document.createElement('div');
+                yarn.onclick = function() {
+                    selectcolor(yarn);
+                };
+                yarn.classList.add('type');
+                yarn.innerHTML = "Yarn "+ (color_arr.length) +" <input class='type-" + (color_arr.length-1) + "' type='color' name='favcolor' value='#ff0000' onchange='changecolor(this.value,this.classList.value)'> <button onclick='removecolor()'>X</button>";
+                container.append(yarn);
+            }
+            function removecolor(){
+
+            }
+            function selectcolor(obj){
+                var selected = obj.getElementsByTagName('input')[0].classList.value.split('-')[1];
+                select = selected;
+                container = document.getElementById("type-container");
+                types = container.getElementsByClassName('type');
+                $(".type").removeClass("type-s");
+                obj.classList.add("type-s")
+            }
+            function changecolor(v, i){
+                ind = parseInt(i.split("-")[1], 10);
+                color_arr[ind] = v;
+                parent = document.getElementById('pattern-container');
+                colored_children = parent.getElementsByClassName('color-'+ind);
+                for (x=0; x< colored_children.length; x++){
+                    colored_children[x].style.backgroundColor = color_arr[ind];
+                }
+            }
+            function zoom(v){
+                z = v;
+                var container = document.getElementById('pattern-container');
+                container.style.width = (600 * z) + "px";
+                container.style.height = (600 * z) + "px";
+                var children = container.getElementsByTagName('div');
+                container.style.gridTemplateColumns = ("" + (600*z / wh) + "px ").repeat(wh);
+            }
+            function adapt(v){
+                wh = v;
+                var container = document.getElementById('pattern-container');
+                container.innerHTML = "";
+                container.style.gridTemplateColumns = ("" + (600*z / wh) + "px ").repeat(wh);
+                for (x = 0; x < v; x++){
+                    for (y = 0; y < v; y++){
+                        var box = document.createElement('div');
+                        box.classList.add("box");
+                        box.classList.add(x.toString());
+                        box.classList.add(y.toString());
+                        box.onclick = function() {
+                            createPatternBlock(this);
+                        };
+                        container.appendChild(box);
+                    }
+                }
+            }
+            function createPatternBlock(el){
+                el.classList.add("color-" + select);
+                el.style.backgroundColor = color_arr[select];
+            }
+        </script>
+    </body>
+</html>

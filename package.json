@@ -1,0 +1,12 @@
+{
+  "name": "color-patterns",
+  "version": "1.0.0",
+  "description": "Create colored knitting patterns",
+  "repository": "https://github.com/probably-not-porter/color-patterns.git",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Porter L",
+  "license": "ISC"
+}
