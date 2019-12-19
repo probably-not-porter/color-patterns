@@ -2,10 +2,16 @@
 <html>
     <head>
         <style>
+            html, body{
+                margin:0px;
+                height: 100%;
+                width: 100%;
+                overflow:hidden;
+            }
             #scroll-container{
                 overflow: scroll;
-                width: 620px;
-                height: 620px;
+                width: 80%;
+                height: 100%;
                 display: inline-block;
             }
             #pattern-container{
@@ -14,17 +20,19 @@
                 background: gray;
                 display: grid;
                 grid-template-columns: auto auto auto;
+                margin: 0 auto;
             }
-            #type-container{
+            #panel-container{
                 display: inline-block;
-                width: 200px;
-                height: 600px;
-                position: absolute;
-                right:0;
+                width: 20%;
+                height: 100%;
                 background-color: #ccc;
+                text-align: center;
+                position:fixed;
+                top:0;
             }
             .box{
-                background-color: #444;
+                background-color: transparent;
                 color: #fff;
                 width: 100%;
                 height: 100%;
@@ -37,25 +45,36 @@
                 border: 1px solid white;
             }
             .done{
+                background-color: transparent;
                 background: url('/img/done.png');
                 background-size: contain;
                 background-repeat: no-repeat;
             }
             .type{
                 background-color: #bbb;
-                width: 90%;
-                margin-left: 5%;
-                margin-right: 5%;
-                height: 50px;
-                margin-bottom: 5px;
-                margin-top: 5px;
-                text-align: center;
+                margin-bottom:10px;
+                vertical-align:middle;
+                height:35px;
             }
             .type-s{
                 box-sizing: border-box;
                 -moz-box-sizing: border-box;
                 -webkit-box-sizing: border-box;
                 border: 1px solid black;
+            }
+            h2{
+                font-size: 20px;
+                padding: 5px;
+                background-color: #aaa;
+                margin-top:0;
+                margin-bottom:10px;
+            }
+            h3{
+                margin:0px;
+                margin-top:10px;
+            }
+            span{
+                vertical-align: middle;
             }
         </style>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
@@ -65,28 +84,40 @@
             <div id='pattern-container'>
             </div>
         </div>
-        <div id='type-container'>
-            <button onclick='addcolor()'>+</button>
+        <div id='panel-container'>
+            <h2>Color Patterns Tool v1</h2>
 
-            <div onclick='selectcolor(this)' class='type r'>
-                Mark Block done
+
+            <div style='background-color: #aaa; margin:10px; margin-top: 0px;padding:5px; padding-top:0px;'>
+                <h3>Settings</h3>
+                <div class="slider-width-height">
+                    <span>Grid Size:</span>
+                    <input type="range" min="1" max="100" value="25" class="slider" onchange="adapt(this.value)">
+                </div>
+                <div class="slider-zoom">
+                    <span>Zoom:</span>
+                    <input type="range" min="1" max="5" value="1" class="slider" onchange="zoom(this.value)">
+                </div>
             </div>
 
-            <div onclick='selectcolor(this)' class='type type-s'>
-                Yarn 1
-                <input class="type-0" type="color" name="favcolor" value="#ff0000" onchange="changecolor(this.value,this.classList.value)">
-                <button onclick='removecolor()'>X</button>
+            <div id='toolbar' style='background-color: #aaa; margin:10px; margin-top: 0px;padding:5px; padding-top:0px;text-align: left;'>
+                <h3>Tools</h3>
+                <br>
+                <button onclick='addcolor()'>+</button>
+                <br><br>
+                <div onclick='selectcolor(this)' style='text-align: left;height:32px;' class='type r'>
+                    <img style="display:inline-block;" src="/img/done.png">
+                    <span style="position:fixed;margin-top:5px;margin-left:10px;">Mark Block done</span>
+                </div>
+                <div onclick='selectcolor(this)' style='text-align: left;height:32px;' class='type type-s'>
+                    <img style="display:inline-block;" width='32px' height='32px' src="/img/color.png">
+                    <span style="position:fixed;margin-top:5px;margin-left:10px;">Yarn 1</span>
+                    <input style="position:fixed;margin-top:3px;margin-left:130px;" class="type-0" type="color" name="favcolor" value="#ff0000" onchange="changecolor(this.value,this.classList.value)">
+                    <button style="position:fixed;margin-top:5px;margin-left:197px;margin-top:0px;" onclick='removecolor()'>X</button>
+                </div>
             </div>
+
         </div>
-        <div class="slider-width-height">
-            <span>Grid Size:</span>
-            <input type="range" min="1" max="100" value="25" class="slider" onchange="adapt(this.value)">
-        </div>
-        <div class="slider-zoom">
-                <span>Zoom:</span>
-            <input type="range" min="1" max="5" value="1" class="slider" onchange="zoom(this.value)">
-        </div>
-        <div class='done'></div>
         <script>
             // VARS
             var wh = 0;
@@ -96,13 +127,14 @@
 
             function addcolor(){
                 color_arr.push("#ff0000");
-                var container = document.getElementById("type-container");
+                var container = document.getElementById("toolbar");
                 var yarn = document.createElement('div');
                 yarn.onclick = function() {
                     selectcolor(yarn);
                 };
                 yarn.classList.add('type');
-                yarn.innerHTML = "Yarn "+ (color_arr.length) +" <input class='type-" + (color_arr.length-1) + "' type='color' name='favcolor' value='#ff0000' onchange='changecolor(this.value,this.classList.value)'> <button onclick='removecolor()'>X</button>";
+                //yarn.innerHTML = "Yarn "+ (color_arr.length) +" <input class='type-" + (color_arr.length-1) + "' type='color' name='favcolor' value='#ff0000' onchange='changecolor(this.value,this.classList.value)'> <button onclick='removecolor()'>X</button>";
+                yarn.innerHTML = "<div onclick='selectcolor(this)' style='text-align: left;height:32px;' class='type type-s'><img style='display:inline-block;' width='32px' height='32px' src='/img/color.png'><span style='position:fixed;margin-top:5px;margin-left:10px;'>Yarn "+ (color_arr.length) +"</span><input style='position:fixed;margin-top:3px;margin-left:130px;' class='type-" + (color_arr.length-1) + "' type='color' name='favcolor' value='#ff0000' onchange='changecolor(this.value,this.classList.value)'><button style='position:fixed;margin-top:5px;margin-left:197px;margin-top:0px;' onclick='removecolor()'>X</button></div>";
                 container.append(yarn);
             }
             function removecolor(){
@@ -118,7 +150,7 @@
                     if (obj.getElementsByTagName('input').length != 0 ){
                         var selected = obj.getElementsByTagName('input')[0].classList.value.split('-')[1];
                         select = selected;
-                        container = document.getElementById("type-container");
+                        container = document.getElementById("panel-container");
                         types = container.getElementsByClassName('type');
                         $(".type").removeClass("type-s");
                         obj.classList.add("type-s")
@@ -161,6 +193,19 @@
                     }
                 }
             }
+            function rgbToHex(col)
+            {
+                if(col.charAt(0)=='r')
+                {
+                    col=col.replace('rgb(','').replace(')','').split(',');
+                    var r=parseInt(col[0], 10).toString(16);
+                    var g=parseInt(col[1], 10).toString(16);
+                    var b=parseInt(col[2], 10).toString(16);
+                    r=r.length==1?'0'+r:r; g=g.length==1?'0'+g:g; b=b.length==1?'0'+b:b;
+                    var colHex='#'+r+g+b;
+                    return colHex;
+                }
+            }
             function createPatternBlock(el){
                 if (select == -1){
                     if (el.classList.contains('done')){
@@ -170,11 +215,19 @@
                     }
                         
                 }else{
-                    el.classList.add("color-" + select);
-                    el.style.backgroundColor = color_arr[select];
-                }
-                
+                    if (color_arr[select] == rgbToHex(el.style.backgroundColor)){
+                        el.classList.remove("color-" + select);
+                        el.style.backgroundColor = "transparent";
+                    }else{
+                        el.classList.add("color-" + select);
+                        el.style.backgroundColor = color_arr[select];
+                    }
+                } 
             }
+            
+            window.addEventListener("load", function(){
+                adapt(25);
+            });
         </script>
     </body>
 </html>
