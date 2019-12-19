@@ -36,6 +36,11 @@
             .box:hover{
                 border: 1px solid white;
             }
+            .done{
+                background: url('/img/done.png');
+                background-size: contain;
+                background-repeat: no-repeat;
+            }
             .type{
                 background-color: #bbb;
                 width: 90%;
@@ -62,6 +67,11 @@
         </div>
         <div id='type-container'>
             <button onclick='addcolor()'>+</button>
+
+            <div onclick='selectcolor(this)' class='type r'>
+                Remove
+            </div>
+
             <div onclick='selectcolor(this)' class='type type-s'>
                 Yarn 1
                 <input class="type-0" type="color" name="favcolor" value="#ff0000" onchange="changecolor(this.value,this.classList.value)">
@@ -69,11 +79,14 @@
             </div>
         </div>
         <div class="slider-width-height">
+            <span>Grid Size:</span>
             <input type="range" min="1" max="100" value="25" class="slider" onchange="adapt(this.value)">
         </div>
         <div class="slider-zoom">
+                <span>Zoom:</span>
             <input type="range" min="1" max="5" value="1" class="slider" onchange="zoom(this.value)">
         </div>
+        <div class='done'></div>
         <script>
             // VARS
             var wh = 0;
@@ -96,12 +109,22 @@
 
             }
             function selectcolor(obj){
-                var selected = obj.getElementsByTagName('input')[0].classList.value.split('-')[1];
-                select = selected;
-                container = document.getElementById("type-container");
-                types = container.getElementsByClassName('type');
-                $(".type").removeClass("type-s");
-                obj.classList.add("type-s")
+                if (obj.classList.contains('r')){
+                    select = -1;
+                    console.log('selected remover')
+                    $(".type").removeClass("type-s");
+                    obj.classList.add("type-s")
+                }else{
+                    if (obj.getElementsByTagName('input').length != 0 ){
+                        var selected = obj.getElementsByTagName('input')[0].classList.value.split('-')[1];
+                        select = selected;
+                        container = document.getElementById("type-container");
+                        types = container.getElementsByClassName('type');
+                        $(".type").removeClass("type-s");
+                        obj.classList.add("type-s")
+                    }
+                }
+                
             }
             function changecolor(v, i){
                 ind = parseInt(i.split("-")[1], 10);
@@ -139,8 +162,18 @@
                 }
             }
             function createPatternBlock(el){
-                el.classList.add("color-" + select);
-                el.style.backgroundColor = color_arr[select];
+                if (select == -1){
+                    if (el.classList.contains('done')){
+                        el.classList.remove("done");
+                    }else{
+                        el.classList.add("done");
+                    }
+                        
+                }else{
+                    el.classList.add("color-" + select);
+                    el.style.backgroundColor = color_arr[select];
+                }
+                
             }
         </script>
     </body>
