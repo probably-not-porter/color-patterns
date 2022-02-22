@@ -4,7 +4,7 @@ var favicon = require('serve-favicon');
 
 const app = express();
 
-//app.use(favicon(path.join(__dirname, 'public/img_icons', 'favicon.png')));
+app.use(favicon(path.join(__dirname, 'public/img_icons', 'favicon.png')));
 
 app.set('view engine', 'ejs');
 app.get('/', function(req, res) {

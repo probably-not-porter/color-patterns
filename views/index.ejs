@@ -3,231 +3,142 @@
     <head>
         <style>
             html, body{
-                margin:0px;
-                height: 100%;
-                width: 100%;
-                overflow:hidden;
-            }
-            #scroll-container{
-                overflow: scroll;
-                width: 80%;
-                height: 100%;
-                display: inline-block;
-            }
-            #pattern-container{
-                width: 600px;
-                height: 600px;
-                background: gray;
-                display: grid;
-                grid-template-columns: auto auto auto;
-                margin: 0 auto;
-            }
-            #panel-container{
-                display: inline-block;
-                width: 20%;
-                height: 100%;
-                background-color: #ccc;
-                text-align: center;
-                position:fixed;
-                top:0;
-            }
-            .box{
-                background-color: transparent;
-                color: #fff;
-                width: 100%;
-                height: 100%;
-                box-sizing: border-box;
-                -moz-box-sizing: border-box;
-                -webkit-box-sizing: border-box;
-                border: 1px solid black;
-            }
-            .box:hover{
-                border: 1px solid white;
-            }
-            .done{
-                background-color: transparent;
-                background: url('/img/done.png');
-                background-size: contain;
-                background-repeat: no-repeat;
-            }
-            .type{
-                background-color: #bbb;
-                margin-bottom:10px;
-                vertical-align:middle;
-                height:35px;
-            }
-            .type-s{
-                box-sizing: border-box;
-                -moz-box-sizing: border-box;
-                -webkit-box-sizing: border-box;
-                border: 1px solid black;
-            }
-            h2{
-                font-size: 20px;
-                padding: 5px;
-                background-color: #aaa;
-                margin-top:0;
-                margin-bottom:10px;
-            }
-            h3{
-                margin:0px;
-                margin-top:10px;
-            }
-            span{
-                vertical-align: middle;
+                margin:0 auto;
+                width: 100vw;
+                height: 100vh;
+                overflow: hidden;
             }
         </style>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     </head>
     <body>
-        <div id='scroll-container'>
-            <div id='pattern-container'>
-            </div>
+        <div id='scrollbox' style='float: left; margin-top: 0px; margin-bottom: 0px;width: 60vw; height: 80vh; overflow: scroll; padding: 10vh;'>
+            <canvas id="grid"></canvas>
         </div>
-        <div id='panel-container'>
-            <h2>Color Patterns Tool v1</h2>
+        <div style='float: left; padding: 20px;'>
+            
+            <br>
+            <label for="files">Select a file</label>
+            <select name="files" id="files">
+                <option value="new">~New~</option>
+            </select>
+            <br><br>
+            <button>Save</button> <button>load</button> <button>rename</button> 
+            <br><br>
+            <button>Export to file</button> <button>Import from file</button>
+            <br><br>
 
-
-            <div style='background-color: #aaa; margin:10px; margin-top: 0px;padding:5px; padding-top:0px;'>
-                <h3>Settings</h3>
-                <div class="slider-width-height">
-                    <span>Grid Size:</span>
-                    <input type="range" min="1" max="100" value="25" class="slider" onchange="adapt(this.value)">
-                </div>
-                <div class="slider-zoom">
-                    <span>Zoom:</span>
-                    <input type="range" min="1" max="5" value="1" class="slider" onchange="zoom(this.value)">
-                </div>
-            </div>
-
-            <div id='toolbar' style='background-color: #aaa; margin:10px; margin-top: 0px;padding:5px; padding-top:0px;text-align: left;'>
-                <h3>Tools</h3>
-                <br>
-                <button onclick='addcolor()'>+ Add Yarn</button>
-                <br><br>
-                <div onclick='selectcolor(this)' style='text-align: left;height:32px;' class='type r'>
-                    <img style="display:inline-block;" src="/img/done.png">
-                    <span style="position:fixed;margin-top:5px;margin-left:10px;">Mark Block done</span>
-                </div>
-                <div onclick='selectcolor(this)' style='text-align: left;height:32px;' class='type type-s'>
-                    <img style="display:inline-block;" width='32px' height='32px' src="/img/color.png">
-                    <span style="position:fixed;margin-top:5px;margin-left:10px;">Yarn 1</span>
-                    <input style="position:fixed;margin-top:3px;margin-left:130px;" class="type-0" type="color" name="favcolor" value="#ff0000" onchange="changecolor(this.value,this.classList.value)">
-                    <button style="position:fixed;margin-top:5px;margin-left:197px;margin-top:0px;" onclick='removecolor()'>X</button>
-                </div>
-            </div>
-
+            <label for="x_size">Width:</label>
+            <input type="text" id="x_size" name="x_size" size="3" value="40">
+            <label for="y_size">Height:</label>
+            <input type="text" id="y_size" name="y_size" size="3" value="60">
+            <br><br>
+            <p>Tools</p>
+            <button>Color</button><button>Split</button><button>Select</button>
+            <p>Zoom:</p>
+            <input type="range" min="11" max="101" value="21" id="zoom" step="10">
         </div>
-        <script>
-            // VARS
-            var wh = 0;
-            var z = 1;
-            var color_arr = ["#ff0000"];
-            var select = 0;
+        
 
-            function addcolor(){
-                color_arr.push("#ff0000");
-                var container = document.getElementById("toolbar");
-                var yarn = document.createElement('div');
-                yarn.onclick = function() {
-                    selectcolor(yarn);
-                };
-                yarn.classList.add('type');
-                //yarn.innerHTML = "Yarn "+ (color_arr.length) +" <input class='type-" + (color_arr.length-1) + "' type='color' name='favcolor' value='#ff0000' onchange='changecolor(this.value,this.classList.value)'> <button onclick='removecolor()'>X</button>";
-                yarn.innerHTML = "<div onclick='selectcolor(this)' style='text-align: left;height:32px;' class='type type-s'><img style='display:inline-block;' width='32px' height='32px' src='/img/color.png'><span style='position:fixed;margin-top:5px;margin-left:10px;'>Yarn "+ (color_arr.length) +"</span><input style='position:fixed;margin-top:3px;margin-left:130px;' class='type-" + (color_arr.length-1) + "' type='color' name='favcolor' value='#ff0000' onchange='changecolor(this.value,this.classList.value)'><button style='position:fixed;margin-top:5px;margin-left:197px;margin-top:0px;' onclick='removecolor()'>X</button></div>";
-                container.append(yarn);
-            }
-            function removecolor(){
 
-            }
-            function selectcolor(obj){
-                if (obj.classList.contains('r')){
-                    select = -1;
-                    console.log('selected remover')
-                    $(".type").removeClass("type-s");
-                    obj.classList.add("type-s")
-                }else{
-                    if (obj.getElementsByTagName('input').length != 0 ){
-                        var selected = obj.getElementsByTagName('input')[0].classList.value.split('-')[1];
-                        select = selected;
-                        container = document.getElementById("panel-container");
-                        types = container.getElementsByClassName('type');
-                        $(".type").removeClass("type-s");
-                        obj.classList.add("type-s")
-                    }
+        <script type="text/javascript" language="javascript">
+            var sq_w = document.getElementById("x_size").value; // init dims
+            var sq_h = document.getElementById("y_size").value;
+            var l = 20; // init zoom
+            const state = [];
+
+            // CREATE INITIAL STATE
+            for (x = 0; x < sq_w; x++){
+                let new_arr = [];
+                for (y=0;y<sq_h;y++){
+                    new_arr.push("#eee");
                 }
-                
-            }
-            function changecolor(v, i){
-                ind = parseInt(i.split("-")[1], 10);
-                color_arr[ind] = v;
-                parent = document.getElementById('pattern-container');
-                colored_children = parent.getElementsByClassName('color-'+ind);
-                for (x=0; x< colored_children.length; x++){
-                    colored_children[x].style.backgroundColor = color_arr[ind];
-                }
-            }
-            function zoom(v){
-                z = v;
-                var container = document.getElementById('pattern-container');
-                container.style.width = (600 * z) + "px";
-                container.style.height = (600 * z) + "px";
-                var children = container.getElementsByTagName('div');
-                container.style.gridTemplateColumns = ("" + (600*z / wh) + "px ").repeat(wh);
-            }
-            function adapt(v){
-                wh = v;
-                var container = document.getElementById('pattern-container');
-                container.innerHTML = "";
-                container.style.gridTemplateColumns = ("" + (600*z / wh) + "px ").repeat(wh);
-                for (x = 0; x < v; x++){
-                    for (y = 0; y < v; y++){
-                        var box = document.createElement('div');
-                        box.classList.add("box");
-                        box.classList.add(x.toString());
-                        box.classList.add(y.toString());
-                        box.onclick = function() {
-                            createPatternBlock(this);
-                        };
-                        container.appendChild(box);
-                    }
-                }
-            }
-            function rgbToHex(col)
-            {
-                if(col.charAt(0)=='r')
-                {
-                    col=col.replace('rgb(','').replace(')','').split(',');
-                    var r=parseInt(col[0], 10).toString(16);
-                    var g=parseInt(col[1], 10).toString(16);
-                    var b=parseInt(col[2], 10).toString(16);
-                    r=r.length==1?'0'+r:r; g=g.length==1?'0'+g:g; b=b.length==1?'0'+b:b;
-                    var colHex='#'+r+g+b;
-                    return colHex;
-                }
-            }
-            function createPatternBlock(el){
-                if (select == -1){
-                    if (el.classList.contains('done')){
-                        el.classList.remove("done");
-                    }else{
-                        el.classList.add("done");
-                    }
-                        
-                }else{
-                    if (color_arr[select] == rgbToHex(el.style.backgroundColor)){
-                        el.classList.remove("color-" + select);
-                        el.style.backgroundColor = "transparent";
-                    }else{
-                        el.classList.add("color-" + select);
-                        el.style.backgroundColor = color_arr[select];
-                    }
-                } 
+                state.push(new_arr);
             }
             
-            window.addEventListener("load", function(){
-                adapt(25);
+            var c_canvas = document.getElementById("grid");
+            var context = c_canvas.getContext("2d");
+
+
+            function draw_grid(){
+
+                context.canvas.width  = sq_w*l + 1;
+                context.canvas.height = sq_h*l + 1;
+
+                for (var x = 0; x <= sq_w; x += 1) {
+                    context.moveTo(x*l, 0);
+                    context.lineTo(x*l, sq_h*l);
+                }
+                for (var y = 0; y <= sq_h; y += 1) {
+                    context.moveTo(0, y*l);
+                    context.lineTo(sq_w*l,y*l);
+                }
+
+                for (x = 0; x < sq_w; x++){
+                    for (y = 0; y < sq_h; y++){
+                        context.fillStyle = state[x][y];
+                        context.fillRect(x*l, y*l, (x+1)*l, (y+1)*l);
+                    }
+                }
+
+                //context.moveTo(0,0);
+                //context.lineTo(380,380);
+
+                context.strokeStyle = 'rgba(0,0,0,0.3)';
+                context.stroke();
+            }
+            draw_grid();
+
+            // ---------------- Actions ---------------- //
+            var scroller = document.getElementById("scrollbox") // get container div for offset
+
+            c_canvas.addEventListener('click', (e) => {
+
+                const pos = {
+                    x: Math.floor((e.clientX - c_canvas.offsetLeft + scroller.scrollLeft) / l),
+                    y: Math.floor((e.clientY - c_canvas.offsetTop + scroller.scrollTop) / l)
+                };
+                state[pos.x][pos.y] = "#00aa00";
+                draw_grid();
             });
+
+            // ---------------- Tools ---------------- //
+            // Change Dims
+            var x_input = document.getElementById("x_size");
+            x_input.onkeydown = function(e) {
+                if(event.key === 'Enter') {
+                    if (x_input.value < sq_w){
+                        if (confirm("Size is smaller than current, clipping will occur. Ok?") == true) {
+                            sq_w = x_input.value;
+                        }
+                    }else{
+                        sq_w = x_input.value;
+                    }
+
+                    draw_grid();
+                }
+            }
+
+            var y_input = document.getElementById("y_size");
+            y_input.onkeydown = function(e) {
+                if(event.key === 'Enter') {
+                    if (y_input.value < sq_h){
+                        if (confirm("Size is smaller than current, clipping will occur. Ok?") == true) {
+                            sq_h = y_input.value;
+                        }
+                    }else{
+                        sq_h = y_input.value;
+                    }
+                    draw_grid();
+                }
+            }
+
+            // Zoom
+            var slider = document.getElementById("zoom");
+            slider.oninput = function() {
+                l = this.value;
+                draw_grid()
+            }
+
         </script>
     </body>
 </html>

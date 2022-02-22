@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            html{
+                font-size: 0px;
+                position: absolute;
+                margin: 0 auto;
+            }
+            body{
+                position: absolute;
+                margin: 0 auto;
+                top:0px;
+                left: 0px;
+            }
+            .square{
+                border: 1px solid black;
+                width: 100px;
+                height: 100px;
+                z-index: 10;
+                overflow: hidden;
+                display:inline-block;
+                margin: 0;
+            }
+            .square:hover{
+
+            }
+            .tri{
+                background-color: red;
+                width: 200px;
+                height: 200px;
+                border: 1px solid black;
+                transform: rotate(45deg);
+            }
+            .tri-0{
+                z-index: 1;
+                margin-left: -142px;
+            }
+            .tri-1{
+                z-index: 2;
+                margin-left: 39px;
+                margin-top: -200px;
+            }
+            .tri-2{
+                z-index: 3;
+                margin-left: 39px;
+                margin-top: -308px;
+            }
+            .tri-3{
+                z-index: 4;
+                margin-left: -50px;
+                margin-top: -291px;
+            }
+            .tri:hover{
+                background-color: green;
+            }
+            #controls{
+                position:fixed;
+                z-index:12;
+                float:left;
+                background-color: rgba(0,0,0,0.2);
+
+            }
+            #controls button{
+                margin: 10px;
+            }
+            #pattern{
+                margin: 100px;
+            }
+            #toolbar{
+                position: fixed;
+                z-index: 12;
+                float:right;
+                right:0px;
+                background-color: rgba(0,0,0,0.2);
+                width: 200px;
+                height: 200px;
+                overflow-y: scroll;
+            }
+        </style>
+    </head>
+    <body>
+        <div id='controls'>
+            <button>Load</button>
+            <button>Save</button>
+        </div>
+        <div id='toolbar'>
+            <div onclick='selectcolor(this)' style='text-align: left;height:32px;' class='type type-s'>
+                <img style="display:inline-block;" width='32px' height='32px' src="/img/color.png">
+                <span style="padding-left: 10px;padding-right: 10px;font-size: 12px; height: 32px; line-height: 32px; vertical-align: bottom;">Yarn 1</span>
+                <input style="" class="type-0" type="color" name="favcolor" value="#ff0000" onchange="changecolor(this.value,this.classList.value)">
+                <button style="" onclick='removecolor()'>X</button>
+            </div>
+        </div>
+        <div id='pattern'>
+            
+        </div>
+
+        <script>
+            const block_template = [
+                "#EEEEEE", // left
+                "#EEEEEE", // top
+                "#EEEEEE", // right
+                "#EEEEEE", // bottom
+            ]
+            let grid = [
+                [block_template, block_template,block_template, block_template,block_template, block_template,block_template, block_template],
+                [block_template, block_template,block_template, block_template,block_template, block_template,block_template, block_template],
+                [block_template, block_template,block_template, block_template,block_template, block_template,block_template, block_template],
+                [block_template, block_template,block_template, block_template,block_template, block_template,block_template, block_template],
+                [block_template, block_template,block_template, block_template,block_template, block_template,block_template, block_template],
+                [block_template, block_template,block_template, block_template,block_template, block_template,block_template, block_template],
+                [block_template, block_template,block_template, block_template,block_template, block_template,block_template, block_template],
+                [block_template, block_template,block_template, block_template,block_template, block_template,block_template, block_template]
+            ]
+            function change_dim(grid, new_x, new_y){
+                let current_x = grid[0].length;
+                let current_y = grid.length;
+
+                // new dim is longer than old dim
+                if (new_y > current_y){
+                    for (j = current_y; j < new_y; j++){
+                        let new_row = [];
+                        for (i = 0; i < current_x; i++){
+                            new_row.push(block_template);
+                        }
+                        grid.push(new_row);
+                        console.log('added row');
+                    }
+                }
+                console.log(grid);
+                // new dim is shorter than old dim
+                if (new_y < current_y){
+                    for (j = new_y; j < current_y; j++){
+                        grid.pop();
+                        console.log("removed row");
+                    }
+                }
+                console.log(grid);
+                // new dim is wider than old dim
+                if (new_x > current_x){
+                    for (j = 0; j < grid.length; j++){
+                        for(i = current_x; i < new_x; i++){
+                            grid[j].push(block_template);
+                        }
+                        console.log('added column');
+                    }
+                }
+                console.log(grid);
+                // new dim is narrower than old dim
+                if (new_x < current_x){
+                    for (j = 0; j < grid.length; j++){
+                        for(i = new_x; i < current_x; i++){
+                            grid[j].pop()
+                        }
+                        console.log("remove column");
+                    }
+                }
+                console.log(grid);
+
+            }
+            function render_grid(data_arr){
+                document.getElementById("pattern").innerHTML = "";
+                document.getElementById("pattern").style.width = data_arr[0].length * 102 + "px";
+                document.getElementById("pattern").style.height = data_arr.length * 102 + "px";
+                for (j = 0;j < data_arr.length;j++){ // loop over rows
+                    for (i=0;i < data_arr[j].length;i++){ // loop over obj
+                        var square = document.createElement("div");
+                        square.className = 'square';
+                        for(x=0;x<4;x++){
+                            var tri = document.createElement("div");
+                            tri.className = 'tri tri-' + x; //create each triangle
+                            square.appendChild(tri)
+                        }
+                        document.getElementById("pattern").appendChild(square);
+                    }
+                    document.getElementById("pattern").innerHTML += "<br>"
+                }
+            }
+        </script>
+    </body>
+</html>
